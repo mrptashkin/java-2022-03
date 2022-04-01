@@ -1,1 +1,1 @@
-# java-2022-03
+Репозиторий для домашних работ по курсу Java Developer.Professional
