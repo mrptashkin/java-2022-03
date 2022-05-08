@@ -4,7 +4,6 @@ import homework.annotation.After;
 import homework.annotation.Before;
 import homework.annotation.Test;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,50 +12,85 @@ import java.util.List;
 public class RunnerTest {
 
     public static void run(Class<?> clazz) {
-        int numOfFailedTests = 0;
-        int numOfPassedTests = 0;
-        List<Method> tests = getAllAnnotations(clazz, Test.class);
-        List<Method> before = getAllAnnotations(clazz, Before.class);
-        List<Method> after = getAllAnnotations(clazz, After.class);
+        System.out.println(runTestAnnotation(clazz));
+    }
 
-        for (Method method : tests) {
-            Object object = null;
+
+    private static List<Method> getBeforeAnnotations(Class<?> clazz) {
+        List<Method> annotationsBefore = new ArrayList<>();
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Before.class)) {
+                annotationsBefore.add(method);
+            }
+        }
+        return annotationsBefore;
+    }
+
+    private static List<Method> getTestAnnotations(Class<?> clazz) {
+        List<Method> annotationsTest = new ArrayList<>();
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Test.class)) {
+                annotationsTest.add(method);
+            }
+        }
+        return annotationsTest;
+    }
+
+    private static List<Method> getAfterAnnotations(Class<?> clazz) {
+        List<Method> annotationsAfter = new ArrayList<>();
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(After.class)) {
+                annotationsAfter.add(method);
+            }
+        }
+        return annotationsAfter;
+    }
+
+    private static Object createObject(Class<?> clazz) {
+        try {
+            return clazz.getConstructor().newInstance();
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException exc) {
+            System.err.println("Creation of new object is failed with " + exc);
+            return null;
+        }
+    }
+
+    private static String runTestAnnotation(Class<?> clazz) {
+        int numOfPassedTests = 0;
+        int numOfFailedTests = 0;
+        for (Method method : getTestAnnotations(clazz)) {
+            Object testObject = createObject(clazz);
             try {
-                object = clazz.getConstructor().newInstance();
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException exc) {
-                System.err.println("Creation of new object is failed with " + exc);
-                          }
-            try {
-                for (Method beforeMethod : before) {
-                    beforeMethod.invoke(object);
-                }
-                method.invoke(object);
+                assert testObject != null;
+                runBeforeAnnotation(testObject);
+                method.invoke(testObject);
                 numOfPassedTests++;
             } catch (InvocationTargetException | IllegalAccessException exc) {
                 numOfFailedTests++;
                 System.err.println("Failed on method \"" + method + "\" with " + exc);
             } finally {
                 try {
-                    for (Method afterMethodLast : after) {
-                        afterMethodLast.invoke(object);
-                    }
-                } catch (InvocationTargetException | IllegalAccessException exc) {
-                    numOfFailedTests++;
+                    assert testObject != null;
+                    runAfterAnnotation(testObject);
+                } catch (Throwable exc) {
                     System.err.println("Failed test for @After with " + exc);
                 }
             }
         }
-        System.out.printf("All tests number - %d.\nSucceed tests number - %d",numOfFailedTests+numOfPassedTests,numOfPassedTests);
+        return "All tests number - " + (numOfPassedTests + numOfFailedTests) + "\nSucceed tests number - " + numOfPassedTests;
     }
 
+    private static void runBeforeAnnotation(Object object) throws InvocationTargetException, IllegalAccessException {
 
-    private static List<Method> getAllAnnotations(Class<?> clazz, Class<? extends Annotation> annotationClass) {
-        List<Method> annotations = new ArrayList<>();
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(annotationClass)) {
-                annotations.add(method);
-            }
+        for (Method beforeMethod : getBeforeAnnotations(object.getClass())) {
+            beforeMethod.invoke(object);
         }
-        return annotations;
     }
+
+    private static void runAfterAnnotation(Object object) throws InvocationTargetException, IllegalAccessException {
+        for (Method afterMethod : getAfterAnnotations(object.getClass())) {
+            afterMethod.invoke(object);
+        }
+    }
+
 }
