@@ -5,7 +5,6 @@ import homework.runner.exceptions.TestClassException;
 import homework.annotation.After;
 import homework.annotation.Before;
 import homework.annotation.Test;
-//import org.junit.jupiter.api.DisplayName;
 
 public class TestedClass {
     private int a, b;
