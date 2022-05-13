@@ -2,8 +2,8 @@ package homework.runner;
 
 import homework.annotation.After;
 import homework.annotation.Before;
-import homework.annotation.Test;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -11,21 +11,6 @@ public class RunnerTest {
 
     public static void runTest(Class<?> clazz) {
         System.out.println(runMethodsForTestAnnotation(clazz));
-    }
-
-
-    private static AnnotatedMethods getAllAnnotatedMethods(Class<?> clazz) {
-        AnnotatedMethods annotatedMethods = new AnnotatedMethods();
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Before.class)) {
-                annotatedMethods.beforeMethods.add(method);
-            } else if (method.isAnnotationPresent(Test.class)) {
-                annotatedMethods.testMethods.add(method);
-            } else if (method.isAnnotationPresent(After.class)) {
-                annotatedMethods.afterMethods.add(method);
-            }
-        }
-        return annotatedMethods;
     }
 
     private static Object createObject(Class<?> clazz) {
@@ -40,12 +25,12 @@ public class RunnerTest {
     private static String runMethodsForTestAnnotation(Class<?> clazz) {
         int numOfPassedTests = 0;
         int numOfFailedTests = 0;
-        AnnotatedMethods annotatedMethods = getAllAnnotatedMethods(clazz);
-        for (Method method : annotatedMethods.testMethods) {
+        AnnotatedMethods annotatedMethods = new AnnotatedMethods(clazz);
+        for (Method method : annotatedMethods.getTestMethods()) {
             Object testObject = createObject(clazz);
             try {
                 assert testObject != null;
-                runMethodsForBefore(testObject, annotatedMethods);
+                runMethodsForBeforeAndAfter(testObject, annotatedMethods, Before.class);
                 method.invoke(testObject);
                 numOfPassedTests++;
             } catch (InvocationTargetException | IllegalAccessException exc) {
@@ -54,7 +39,7 @@ public class RunnerTest {
             } finally {
                 try {
                     assert testObject != null;
-                    runMethodsForAfter(testObject, annotatedMethods);
+                    runMethodsForBeforeAndAfter(testObject, annotatedMethods, After.class);
                 } catch (Throwable exc) {
                     System.err.println("Failed test for @After with " + exc);
                 }
@@ -63,16 +48,19 @@ public class RunnerTest {
         return "All tests number - " + (numOfPassedTests + numOfFailedTests) + "\nSucceed tests number - " + numOfPassedTests;
     }
 
-    private static void runMethodsForBefore(Object object, AnnotatedMethods annotatedMethods) throws InvocationTargetException, IllegalAccessException {
-        for (Method method : annotatedMethods.beforeMethods) {
-            method.invoke(object);
+    private static void runMethodsForBeforeAndAfter(Object object, AnnotatedMethods annotatedMethods, Class<? extends Annotation> annotation) throws InvocationTargetException, IllegalAccessException {
+        if (annotatedMethods.getBeforeAfter(annotation).equals("Before")) {
+            for (Method method : annotatedMethods.getBeforeMethods()) {
+                method.invoke(object);
+            }
+        } else if (annotatedMethods.getBeforeAfter(annotation).equals("After")) {
+            for (Method method : annotatedMethods.getAfterMethods()) {
+                method.invoke(object);
+            }
+        } else {
+            System.out.println("Incorrect annotation");
         }
     }
 
-    private static void runMethodsForAfter(Object object, AnnotatedMethods annotatedMethods) throws InvocationTargetException, IllegalAccessException {
-        for (Method method : annotatedMethods.afterMethods) {
-            method.invoke(object);
-        }
-    }
 
 }
