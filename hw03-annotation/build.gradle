@@ -1,9 +1,7 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow'
 }
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
 
 dependencies {
     testImplementation ('org.junit.jupiter:junit-jupiter-api')
@@ -25,3 +23,14 @@ tasks.withType(JavaCompile) {
         encoding = 'UTF-8'
     }
 }
+
+shadowJar {
+    archiveBaseName.set('hw03-annotations')
+    archiveVersion.set('0.1')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': 'homework.runner.Main'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar
