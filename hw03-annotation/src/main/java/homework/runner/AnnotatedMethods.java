@@ -15,7 +15,7 @@ public class AnnotatedMethods {
     private final List<Method> beforeMethods = new ArrayList<>();
     private final List<Method> afterMethods = new ArrayList<>();
     private final List<Method> testMethods = new ArrayList<>();
-private final Map<Class<? extends Annotation>, String> beforeAfter = new HashMap<>();
+    private final Map<Class<? extends Annotation>, String> beforeAfter = new HashMap<>();
 
     public AnnotatedMethods(Class<?> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {
@@ -27,8 +27,8 @@ private final Map<Class<? extends Annotation>, String> beforeAfter = new HashMap
                 afterMethods.add(method);
             }
         }
-        beforeAfter.put(Before.class,"Before");
-        beforeAfter.put(After.class,"After");
+        beforeAfter.put(Before.class, "Before");
+        beforeAfter.put(After.class, "After");
     }
 
 
