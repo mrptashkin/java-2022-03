@@ -1,0 +1,9 @@
+Heap, Mb	Spend time (before optimization), msec	Spend time (after optimization), msec
+256	java.lang.OutOfMemoryError: Java heap space	2098
+512	9857	1607
+1024	8809	1496
+2048	7916	1448
+3072	7810	1569
+4096	7660	1527
+5120	7828	1486
+6144	8115	1494
