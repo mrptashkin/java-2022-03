@@ -1,5 +1,5 @@
 
-public class Demo implements DemoInterface, TestLogging {
+public class Demo implements TestLogging {
     private int param1;
     private int param2;
     private String param3;
@@ -21,17 +21,20 @@ public class Demo implements DemoInterface, TestLogging {
     }
 
     @Override
+    @Log
     public void modifyValues(int param1) {
         setParam1(param1);
     }
 
     @Override
+    @Log
     public void modifyValues(int param1, int param2) {
         setParam1(param1);
         setParam2(param2);
     }
 
     @Override
+    @Log
     public void modifyValues(int param1, int param2, String param3) {
         setParam1(param1);
         setParam2(param2);

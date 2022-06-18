@@ -1,6 +1,7 @@
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 
 public class Ioc {
 
@@ -19,14 +20,25 @@ public class Ioc {
         return (TestLogging) Proxy.newProxyInstance(demoClassLoader, interfaces, handler);
     }
 
-    private record DemoInvocationHandler(TestLogging demo) implements InvocationHandler {
+    private static class DemoInvocationHandler implements InvocationHandler {
+        private final TestLogging demo;
+        ArrayList<String> methods = new ArrayList<>();
+
+        DemoInvocationHandler(TestLogging demo) {
+            this.demo = demo;
+            for (Method method : demo.getClass().getDeclaredMethods()) {
+                if (method.isAnnotationPresent(Log.class))
+                {
+                    methods.add(method.getName());
+                }
+            }
+        }
+
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-            if (method.isAnnotationPresent(Log.class)) {
-                System.out.println(buildLogMessage(method, args));
-            }
+            if (methods.contains(method.getName())){
+            System.out.println(buildLogMessage(method, args));}
             return method.invoke(demo, args);
         }
 
