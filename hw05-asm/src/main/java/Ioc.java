@@ -1,7 +1,9 @@
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Ioc {
 
@@ -22,14 +24,14 @@ public class Ioc {
 
     private static class DemoInvocationHandler implements InvocationHandler {
         private final TestLogging demo;
-        ArrayList<String> methods = new ArrayList<>();
+        Set<String> methods = new HashSet<>();
 
         DemoInvocationHandler(TestLogging demo) {
             this.demo = demo;
             for (Method method : demo.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Log.class))
-                {
-                    methods.add(method.getName());
+                if (method.isAnnotationPresent(Log.class)) {
+                    String methodAndParameters = method.getName()+ Arrays.toString(method.getParameterTypes());
+                    methods.add(methodAndParameters);
                 }
             }
         }
@@ -37,8 +39,10 @@ public class Ioc {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (methods.contains(method.getName())){
-            System.out.println(buildLogMessage(method, args));}
+            String currentMethodAndParameters = method.getName()+ Arrays.toString(method.getParameterTypes());
+            if (methods.contains(currentMethodAndParameters)) {
+                System.out.println(buildLogMessage(method, args));
+            }
             return method.invoke(demo, args);
         }
 
