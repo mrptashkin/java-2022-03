@@ -15,7 +15,8 @@ public class Main {
     static void menuATM() {
         Account account = new Account(1_000_000);
         Scanner scanner = new Scanner(System.in);
-        ATM atm = new ATM(account);
+        Cell cell = new Cell();
+        ATM atm = new ATM(account,cell);
         label:
         while (true) {
             try {
@@ -23,7 +24,7 @@ public class Main {
                 switch (scanner.nextInt()) {
                     case 1 -> atm.showBalance(account);
 
-                    case 2 -> atm.acceptCash();
+                    case 2 -> atm.acceptAddCash();
 
                     case 3 -> {
                         System.out.println("Введите сумму к выдаче:\n");
