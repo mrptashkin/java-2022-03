@@ -1,19 +1,19 @@
 import java.util.*;
 
 public class ATM implements CashOperation {
-    private final Account account;
-    private final Cell cell;
+    private final Cells cell;
     private int balanceATM;
+    private int balanceAccount;
 
-    public ATM(Account account, Cell cell) {
-        this.account = account;
+    public ATM(Cells cell) {
+        balanceAccount = 1_000_000;
         this.cell = cell;
         balanceATM = cell.getBalance();
 
     }
 
-
-    public void acceptAddCash() {
+    @Override
+    public void acceptCash() {
         System.out.println("Внесение наличных:");
         Scanner scanner = new Scanner(System.in);
         TreeMap<Integer, Integer> countsOfDenominations = new TreeMap<>();
@@ -25,14 +25,14 @@ public class ATM implements CashOperation {
             countsOfDenominations.put(count, currentCount);
             sumCash += count * currentCount;
         }
-        cell.acceptAdd1Cash(countsOfDenominations);
+        cell.acceptCash(countsOfDenominations);
         System.out.printf("Вы внесли %d БАНКОМАТ", sumCash);
-        account.setBalance(account.getBalance() + sumCash);
+        balanceAccount += sumCash;
         balanceATM = cell.getBalance();
     }
 
-    public void showBalance(Account account) {
-        System.out.println("\nОстаток на вашем счете: " + account.getBalance());
+    public void showBalance() {
+        System.out.println("\nОстаток на вашем счете: " + balanceAccount);
     }
 
     public boolean canIGiveCash(int sum) {
@@ -40,7 +40,7 @@ public class ATM implements CashOperation {
             System.out.println("Указанная сумма отсутствует в  ATM\n");
             return false;
         }
-        if (account.getBalance() < sum) {
+        if (balanceAccount < sum) {
             System.out.println("На вашем балансе недостаточно средств\n");
             return false;
         }
@@ -55,7 +55,7 @@ public class ATM implements CashOperation {
     public void giveCash(int sum) {
         if (canIGiveCash(sum)) {
             cell.giveCash(sum);
-            account.setBalance(account.getBalance() - sum);
+            balanceAccount -= sum;
         }
         balanceATM = cell.getBalance();
     }
@@ -66,4 +66,3 @@ public class ATM implements CashOperation {
         System.out.println("Денег в банкомате:" + balanceATM);
     }
 }
-

@@ -1,15 +1,15 @@
 import java.util.*;
 
-public class Cell implements CashOperation {
+public class Cells implements CellsOperation {
     private final Map<Integer, Integer> cells;
     private final int NUMBER_OF_NOTES = 500;
     private int balanceCells;
 
-    public Cell() {
+    public Cells() {
         cells = new TreeMap<>();
         for (Denominations d : Denominations.values()) {
-            cells.put(d.title, NUMBER_OF_NOTES);
-            balanceCells += d.title * NUMBER_OF_NOTES;
+            cells.put(d.getTitle(), NUMBER_OF_NOTES);
+            balanceCells += d.getTitle() * NUMBER_OF_NOTES;
         }
     }
 
@@ -18,23 +18,12 @@ public class Cell implements CashOperation {
     }
 
 
-    private enum Denominations {
-        FIFTY(50), ONE_HUNDRED(100), FIVE_HUNDRED(500), ONE_THOUSAND(1000), FIVE_THOUSAND(5000);
-
-        private final int title;
-
-        Denominations(int title) {
-            this.title = title;
-        }
-
-    }
-
-
     public int getBalance() {
         return balanceCells;
     }
 
-    public void acceptAdd1Cash(TreeMap<Integer, Integer> resultNotes) {
+    @Override
+    public void acceptCash(TreeMap<Integer, Integer> resultNotes) {
         int countOfDenominations;
         for (Integer key : cells.keySet()) {
             countOfDenominations = resultNotes.get(key);
@@ -48,7 +37,7 @@ public class Cell implements CashOperation {
         try {
             Map<Integer, Integer> notes = new TreeMap<>(Comparator.reverseOrder());
             for (Denominations d : Denominations.values()) {
-                notes.put(d.title, 0);
+                notes.put(d.getTitle(), 0);
             }
             for (Integer key : notes.keySet()) {
                 if (sum >= key) {
