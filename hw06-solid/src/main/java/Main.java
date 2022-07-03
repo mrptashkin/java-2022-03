@@ -14,8 +14,7 @@ public class Main {
 
     static void menuATM() {
         Scanner scanner = new Scanner(System.in);
-        Cells cell = new Cells();
-        ATM atm = new ATM(cell);
+        ATM atm = new ATM();
         label:
         while (true) {
             try {
@@ -26,7 +25,7 @@ public class Main {
                     case 2 -> atm.acceptCash();
 
                     case 3 -> {
-                        System.out.println("Введите сумму к выдаче:\n");
+                        System.out.println("Введите сумму к выдаче (кратную 50) :\n");
                         atm.giveCash(scanner.nextInt());
                     }
                     case 4 -> atm.informAboutATM();
