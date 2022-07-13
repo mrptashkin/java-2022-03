@@ -15,7 +15,6 @@ public class ProcessorHonestSecond implements Processor {
     @Override
     public Message process(Message message) {
         var currentSecond = timeProvider.getTime().getSecond();
-        System.out.println(currentSecond);
         if (currentSecond % 2 == 0) {
             throw new IllegalStateException("Нечетная секунда");
         }
