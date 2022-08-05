@@ -28,8 +28,9 @@ allprojects {
             }
             dependency "com.google.code.gson:gson:${Versions.gson}"
             dependency "com.google.guava:guava:${Versions.guava}"
-            dependency ("org.openjdk.jmh:jmh-core:${Versions.jmh}")
-            dependency ("org.openjdk.jmh:jmh-generator-annprocess:${Versions.jmh}")
+            dependency "org.openjdk.jmh:jmh-core:${Versions.jmh}"
+            dependency "org.openjdk.jmh:jmh-generator-annprocess:${Versions.jmh}"
+            dependency "commons-io:commons-io:${Versions.io}"
 
         }
     }

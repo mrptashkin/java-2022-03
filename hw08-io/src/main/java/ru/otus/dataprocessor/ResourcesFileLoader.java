@@ -2,13 +2,14 @@ package ru.otus.dataprocessor;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.io.IOUtils;
 import ru.otus.model.Measurement;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Scanner;
 
 public class ResourcesFileLoader implements Loader {
 
@@ -23,8 +24,7 @@ public class ResourcesFileLoader implements Loader {
         Type itemsListType = new TypeToken<List<Measurement>>() {
         }.getType();
         try (InputStream inputStream = getFileFromResourceAsStream(fileName)) {
-            Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-            String result = s.hasNext() ? s.next() : "";
+            String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             return new Gson().fromJson(result, itemsListType);
         } catch (FileProcessException e) {
             e.printStackTrace();
