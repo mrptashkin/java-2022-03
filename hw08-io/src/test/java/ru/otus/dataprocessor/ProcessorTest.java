@@ -24,7 +24,7 @@ class ProcessorTest {
         var outputDataFileName = "outputData.json";
         var fullOutputFilePath = String.format("%s%s%s",tempDir, File.separator, outputDataFileName);
 
-        var loader = new ResourcesFileLoader(inputDataFileName);
+        var loader = new ResourcesFileLoader();
         var processor = new ProcessorAggregator();
         var serializer = new FileSerializer(fullOutputFilePath);
 
