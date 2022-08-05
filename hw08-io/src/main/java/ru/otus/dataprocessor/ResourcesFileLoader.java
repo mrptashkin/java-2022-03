@@ -15,8 +15,8 @@ public class ResourcesFileLoader implements Loader {
 
     final private String fileName;
 
-    public ResourcesFileLoader() {
-        this.fileName = "inputData.json";
+    public ResourcesFileLoader(String fileName) {
+        this.fileName = fileName;
     }
 
     @Override
