@@ -1,10 +1,15 @@
 package ru.otus.jdbc.mapper;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
 
     private final EntityClassMetaData<?> entityClassMetaData;
+    private String selectAllFormed;
+    private String selectByIdFormed;
+    private String insertFormed;
+    private String updateFormed;
 
     public EntitySQLMetaDataImpl(EntityClassMetaData<?> entityClassMetaData) {
         this.entityClassMetaData = entityClassMetaData;
@@ -12,45 +17,46 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
 
     @Override
     public String getSelectAllSql() {
-        return String.format("SELECT * FROM %s", entityClassMetaData.getName().toLowerCase());
+        if (selectAllFormed == null) {
+            selectAllFormed = String.format("SELECT * FROM %s", entityClassMetaData.getName().toLowerCase());
+        }
+        return selectAllFormed;
     }
 
     @Override
     public String getSelectByIdSql() {
-        return String.format("SELECT * FROM %s WHERE %s = ?"
-                , entityClassMetaData.getName().toLowerCase(),
-                entityClassMetaData.getIdField().getName().toLowerCase());
+        if (selectByIdFormed == null) {
+            selectByIdFormed = String.format("SELECT * FROM %s WHERE %s = ?"
+                    , entityClassMetaData.getName().toLowerCase(),
+                    entityClassMetaData.getIdField().getName().toLowerCase());
+        }
+        return selectByIdFormed;
     }
 
 
     @Override
     public String getInsertSql() {
-        StringBuilder values = new StringBuilder();
-        StringBuilder insertingValues = new StringBuilder();
-        for (Field field : entityClassMetaData.getFieldsWithoutId()) {
-            values.append(field.getName()).append(", ");
-            insertingValues.append("?, ");
+        if (insertFormed == null) {
+            List<String> fieldsNames = entityClassMetaData.getFieldsWithoutId().stream().map(Field::getName).toList();
+            String values = String.join(",", fieldsNames);
+            String insertingValues = String.join(",", fieldsNames.stream().map(s -> "?").toList());
+            insertFormed = String.format("INSERT INTO %s (%s) VALUES (%s)",
+                    entityClassMetaData.getName().toLowerCase(),
+                    values,
+                    insertingValues);
         }
-        values.delete(values.length() - 2, values.length());
-        insertingValues.delete(insertingValues.length() - 2, insertingValues.length());
-        return String.format("INSERT INTO %s (%s) VALUES (%s)",
-                entityClassMetaData.getName().toLowerCase(),
-                values,
-                insertingValues);
+        return insertFormed;
     }
 
     @Override
     public String getUpdateSql() {
-        StringBuilder updatedFields = new StringBuilder();
-        for (Field field : entityClassMetaData.getFieldsWithoutId()) {
-            updatedFields.append(field.getName()).append(" = ?, ");
+        if (updateFormed == null) {
+            String updatedFields = String.join(" = ?, ", entityClassMetaData.getFieldsWithoutId().stream().map(Field::getName).toList());
+            updateFormed = String.format("UPDATE %s SET %s WHERE %s = ?",
+                    entityClassMetaData.getName().toLowerCase(),
+                    updatedFields,
+                    entityClassMetaData.getIdField().getName().toLowerCase());
         }
-        updatedFields.delete(updatedFields.length() - 2, updatedFields.length());
-        return String.format("UPDATE %s SET %s WHERE %s = ?",
-                entityClassMetaData.getName().toLowerCase(),
-                updatedFields,
-                entityClassMetaData.getIdField().getName().toLowerCase());
+        return updateFormed;
     }
-
-
 }

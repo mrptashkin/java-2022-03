@@ -38,7 +38,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     return createObjectT(rs);
                 }
             } catch (SQLException | InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException e) {
-                e.printStackTrace();
+                throw new DataTemplateException(e);
             }
             return null;
         });
